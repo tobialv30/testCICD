@@ -32,7 +32,11 @@ jobs:
 
       - name: 📣 Notificar resultado en Slack vía Webhook
         if: always()
+        env:
+          STATUS: ${{ job.status }}
         run: |
-          STATUS="${{ job.status }}"
-          PAYLOAD="{\"text\": \"*CI Notification*\n• Repositorio: `${{ github.repository }}`\n• Trabajo: `${{ github.job }}`\n• Estado: `${STATUS}`\n• Commit: `${{ github.sha }}`\"}"
-          curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" ${{ secrets.SLACK_WEBHOOK_URL }}
+          curl -X POST -H 'Content-type: application/json' --data "{\"text\": \"*CI Notification*
+• Repositorio: $GITHUB_REPOSITORY
+• Trabajo: $GITHUB_JOB
+• Estado: $STATUS
+• Commit: $GITHUB_SHA\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
