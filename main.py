@@ -1,8 +1,5 @@
-# main.py
+# src/main.py
 
-def saludo():
-    
-    return "Hola, mundo!"
+def sumar(a, b):
+    return a + b
 
-if __name__ == "__main__":
-    print(saludo())

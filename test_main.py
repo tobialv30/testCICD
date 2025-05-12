@@ -1,7 +1,8 @@
-# test_main.py
+# tests/test_main.py
 
-from main import saludo
+from main import sumar
 
-
-def test_saludo():
-    assert saludo() == "Hola, mundo!"
+def test_sumar():
+    assert sumar(2, 3) == 5
+    assert sumar(-1, 1) == 0
+    assert sumar(0, 0) == 0
