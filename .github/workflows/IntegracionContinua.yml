@@ -24,8 +24,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Ejecutar pruebas con pytest
-        run: pytest
+      - name: Ejecutar pruebas y capturar salida
+        run: |
+          pytest > result.log || true
+
+      - name: Leer salida de pruebas
+        id: leer_salida
+        run: |
+          echo "resultado=$(tail -n 20 result.log)" >> $GITHUB_OUTPUT
 
       - name: Notificar a Slack
         if: always()
@@ -33,7 +39,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Estado del build: ${{ job.status }}\nRepositorio: ${{ github.repository }}\nCommit: ${{ github.sha }}\nBranch: ${{ github.ref }}"
+              "text": "*Estado del build:* ${{ job.status }}\n*Repositorio:* ${{ github.repository }}\n*Commit:* ${{ github.sha }}\n*Branch:* ${{ github.ref }}\n*Resumen de pruebas:*\n```${{ steps.leer_salida.outputs.resultado }}```"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
