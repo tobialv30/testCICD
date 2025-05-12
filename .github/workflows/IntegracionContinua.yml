@@ -37,11 +37,17 @@ jobs:
 
       - name: Notificar a Slack
         if: always()
-        uses: slackapi/slack-github-action@v1.23.0
+        uses: slackapi/slack-github-action@v2.0.0
         with:
           payload: |
-            {
-              "text": "*Estado del build:* ${{ job.status }}\n*Repositorio:* ${{ github.repository }}\n*Commit:* ${{ github.sha }}\n*Branch:* ${{ github.ref }}\n*Resumen de pruebas:*\n```${{ steps.leer_salida.outputs.resultado }}```"
-            }
+            text: |
+              *Estado del build:* ${{ job.status }}
+              *Repositorio:* ${{ github.repository }}
+              *Commit:* ${{ github.sha }}
+              *Branch:* ${{ github.ref }}
+              *Resumen de pruebas:*
+              ```
+              ${{ steps.leer_salida.outputs.resultado }}
+              ```
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
