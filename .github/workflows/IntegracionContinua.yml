@@ -1,4 +1,3 @@
-
 name: CI Python + Slack
 
 on:
@@ -25,39 +24,32 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ————————————————————————————————
-      # Ejecutar pytest y guardar la salida completa
-      - name: Ejecutar pruebas con pytest
+      - name: Ejecutar pruebas con pytest y guardar salida
         run: |
           pytest --maxfail=1 -q | tee result.log
 
-      # ————————————————————————————————
-      # Extraer la primera línea que contenga “FAILED”
       - name: Extraer primer fallo
         id: extract_error
         run: |
           error_line=$(grep -m1 "FAILED" result.log || echo "✅ Todas las pruebas pasaron")
           echo "::set-output name=error::$error_line"
 
-      # ————————————————————————————————
-      # Notificar a Slack usando bloques para mayor claridad
       - name: Notificar a Slack
         if: always()
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {
+              "text": "*Build ${{ job.status }}* en `${{ github.repository }}` — ver detalles en Slack",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Estado del build:* `${{ job.status }}`\n*Repositorio:* `${{ github.repository }}`\n*Commit:* `${{ github.sha }}`\n*Branch:* `${{ github.ref }}`"
+                    "text": "*Estado del build:* `${{ job.status }}`\n*Commit:* `${{ github.sha }}`\n*Branch:* `${{ github.ref }}`"
                   }
                 },
-                {
-                  "type": "divider"
-                },
+                { "type": "divider" },
                 {
                   "type": "section",
                   "text": {
