@@ -1,37 +1,71 @@
-- name: Ejecutar pruebas y capturar salida
-  run: |
-    pytest > result.log || true
 
-- name: Leer salida de pruebas
-  id: leer_salida
-  run: |
-    echo 'resultado<<EOF' >> $GITHUB_OUTPUT
-    tail -n 20 result.log >> $GITHUB_OUTPUT
-    echo 'EOF' >> $GITHUB_OUTPUT
+name: CI Python + Slack
 
-- name: Notificar a Slack
-  if: always()
-  uses: slackapi/slack-github-action@v1.23.0
-  with:
-    payload: |
-      {
-        "blocks": [
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "*Estado del build:* ${{ job.status }}\n*Repositorio:* ${{ github.repository }}\n*Commit:* ${{ github.sha }}\n*Branch:* ${{ github.ref }}"
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ————————————————————————————————
+      # Ejecutar pytest y guardar la salida completa
+      - name: Ejecutar pruebas con pytest
+        run: |
+          pytest --maxfail=1 -q | tee result.log
+
+      # ————————————————————————————————
+      # Extraer la primera línea que contenga “FAILED”
+      - name: Extraer primer fallo
+        id: extract_error
+        run: |
+          error_line=$(grep -m1 "FAILED" result.log || echo "✅ Todas las pruebas pasaron")
+          echo "::set-output name=error::$error_line"
+
+      # ————————————————————————————————
+      # Notificar a Slack usando bloques para mayor claridad
+      - name: Notificar a Slack
+        if: always()
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Estado del build:* `${{ job.status }}`\n*Repositorio:* `${{ github.repository }}`\n*Commit:* `${{ github.sha }}`\n*Branch:* `${{ github.ref }}`"
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Error destacado:* `${{ steps.extract_error.outputs.error }}`"
+                  }
+                }
+              ]
             }
-          },
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "*Resumen de pruebas:*\n```${{ steps.leer_salida.outputs.resultado }}```"
-            }
-          }
-        ]
-      }
-  env:
-    SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
