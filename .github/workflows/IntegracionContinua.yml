@@ -75,10 +75,9 @@ jobs:
                     }
                   ],
                   "footer": "GitHub Actions",
-                  "ts": $(date +%s)
+                  "ts": "${{ toJSON(github.run_started_at) }}"
                 }
               ]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
