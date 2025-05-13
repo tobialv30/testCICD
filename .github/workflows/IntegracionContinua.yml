@@ -33,11 +33,10 @@ jobs:
         with:
           payload: |
             {
-              "text": "🚀 Resultado del CI - Estado del build: ${{ job.status }}",
+              "text": "🚀 Resultado del CI - Estado del build: *${{ job.status }}*",
               "attachments": [
                 {
                   "color": "${{ job.status == 'success' && '#36a64f' || '#ff0000' }}",
-                  "title": "🚀 Resultado del CI - Python + Slack",
                   "fields": [
                     {
                       "title": "Estado del build",
@@ -71,12 +70,10 @@ jobs:
                     },
                     {
                       "title": "URL del Run",
-                      "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                      "value": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Ver detalles del run>",
                       "short": false
                     }
-                  ],
-                  "footer": "GitHub Actions",
-                  "ts": "${{ toJSON(github.run_started_at) }}"
+                  ]
                 }
               ]
             }
