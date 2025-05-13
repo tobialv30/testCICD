@@ -33,6 +33,7 @@ jobs:
         with:
           payload: |
             {
+              "text": "🚀 Resultado del CI - Estado del build: ${{ job.status }}",
               "attachments": [
                 {
                   "color": "${{ job.status == 'success' && '#36a64f' || '#ff0000' }}",
