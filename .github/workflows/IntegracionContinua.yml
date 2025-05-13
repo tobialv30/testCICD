@@ -33,50 +33,59 @@ jobs:
         with:
           payload: |
             {
-              "text": "🚀 Resultado del CI - Estado del build: *${{ job.status }}*",
-              "attachments": [
+              "blocks": [
                 {
-                  "color": "${{ job.status == 'success' && '#36a64f' || '#ff0000' }}",
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🚀 *Resultado del CI* - Estado del build: *${{ job.status }}*"
+                  }
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
                   "fields": [
                     {
-                      "title": "Estado del build",
-                      "value": "${{ job.status }}",
-                      "short": true
+                      "type": "mrkdwn",
+                      "text": "*Estado del build:*\n${{ job.status }}"
                     },
                     {
-                      "title": "Repositorio",
-                      "value": "${{ github.repository }}",
-                      "short": true
+                      "type": "mrkdwn",
+                      "text": "*Repositorio:*\n${{ github.repository }}"
                     },
                     {
-                      "title": "Branch",
-                      "value": "${{ github.ref_name }}",
-                      "short": true
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
                     },
                     {
-                      "title": "Autor del commit",
-                      "value": "${{ github.actor }}",
-                      "short": true
-                    },
-                    {
-                      "title": "Mensaje del commit",
-                      "value": "${{ github.event.head_commit.message }}",
-                      "short": false
-                    },
-                    {
-                      "title": "Commit SHA",
-                      "value": "${{ github.sha }}",
-                      "short": false
-                    },
-                    {
-                      "title": "URL del Run",
-                      "value": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Ver detalles del run>",
-                      "short": false
+                      "type": "mrkdwn",
+                      "text": "*Autor del commit:*\n${{ github.actor }}"
                     }
                   ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Mensaje del commit:*\n${{ github.event.head_commit.message }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit SHA:*\n${{ github.sha }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Ver detalles del run>"
+                  }
                 }
               ]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          ACTIONS_STEP_DEBUG: true
