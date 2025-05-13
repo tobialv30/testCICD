@@ -24,15 +24,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Ejecutar pruebas con pytest y guardar salida
-        run: |
-          pytest --maxfail=1 -q | tee result.log
-
-      - name: Extraer primer fallo
-        id: extract_error
-        run: |
-          error_line=$(grep -m1 "FAILED" result.log || echo "✅ Todas las pruebas pasaron")
-          echo "::set-output name=error::$error_line"
+      - name: Ejecutar pruebas con pytest
+        run: pytest
 
       - name: Notificar a Slack
         if: always()
@@ -40,24 +33,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "*Build ${{ job.status }}* en `${{ github.repository }}` — ver detalles en Slack",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Estado del build:* `${{ job.status }}`\n*Commit:* `${{ github.sha }}`\n*Branch:* `${{ github.ref }}`"
-                  }
-                },
-                { "type": "divider" },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Error destacado:* `${{ steps.extract_error.outputs.error }}`"
-                  }
-                }
-              ]
+              "text": "Estado del build: ${{ job.status }}\nRepositorio: ${{ github.repository }}\nCommit: ${{ github.sha }}\nBranch: ${{ github.ref }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
