@@ -27,31 +27,13 @@ jobs:
       - name: Ejecutar pruebas con pytest
         run: pytest
 
-      - name: Debug valores
-        run: |
-          echo "Estado del build: ${{ job.status }}"
-          echo "Repositorio: ${{ github.repository }}"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Autor: ${{ github.actor }}"
-          echo "Mensaje del commit: ${{ github.event.head_commit.message }}"
-          echo "SHA: ${{ github.sha }}"
-
       - name: Notificar a Slack
         if: always()
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {
-              "text": "🚀 Resultado del CI - Estado del build: *${{ job.status }}*",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "🚀 *Esto es un bloque de prueba*"
-                  }
-                }
-              ]
+              "text": "🚀 Resultado del CI\n\n*Estado del build:* ${{ job.status }}\n*Repositorio:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Autor del commit:* ${{ github.actor }}\n*Mensaje del commit:* ${{ github.event.head_commit.message }}\n*Commit SHA:* ${{ github.sha }}\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Ver detalles del run>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
