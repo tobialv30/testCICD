@@ -33,6 +33,7 @@ jobs:
         with:
           payload: |
             {
+              "text": "🚀 Resultado del CI - Estado del build: *${{ job.status }}*",
               "blocks": [
                 {
                   "type": "section",
