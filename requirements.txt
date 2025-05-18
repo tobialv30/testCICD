@@ -1,2 +1,3 @@
-# Agrega aquí tus dependencias
+flask
 pytest
+gunicorn
