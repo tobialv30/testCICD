@@ -3,4 +3,4 @@
 from main import sumar
 
 def test_sumar():
-    assert sumar(3, 3) == 0
+    assert sumar(3, 3) == 6
