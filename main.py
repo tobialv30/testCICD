@@ -3,7 +3,7 @@ from flask import Flask, request, render_template
 app = Flask(__name__)
 
 def sumar(a, b):
-    return a + b
+    return a - b
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
